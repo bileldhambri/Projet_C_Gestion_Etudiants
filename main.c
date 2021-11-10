@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 typedef struct{
-    int cin;
+    char cin[9];
     char nom[20];
     char prenom[30];
     int age;
@@ -10,34 +11,67 @@ typedef struct{
 }etudiant;
 
 typedef struct{
+int cin;
+float note;
+}note;
+
+typedef struct{
     char nom[20];
     float coeff;
-    float note_partiel[40];
-    float note_examen[40];
+    note note_partiel[40];
+    note note_examen[40];
 }matiere;
+
+// vérification
+int verification_cin(char cin[]){
+int i=0;
+int verif=1;
+while(i<strlen(cin)&&verif){
+
+    if(!((cin[i]>='0')&&(cin[i]<='9')))
+    {
+        verif=0;
+    }
+    i++;
+}
+return verif;
+}
+
 //étudiants
 
 void affichage_liste_etudiant(etudiant etudiants[],int n){
-printf("\nN°      N°Cin           Nom                    Prenom          Age             Taille            Poids      \n\n\n");
+printf("\nN°      \t N°Cin       \t \t Nom                    Prenom          Age             Taille          \tPoids      \n\n\n");
 for(int i=0;i<n;i++){
-printf("%d \t",i+1);
+printf("%d \t\t",i+1);
 afficher_etudiant(etudiants[i]);
 printf("\n");
 }
 }
+
+
 void saisie_etudiant(etudiant *e){
+
+do{
 printf("Donnez N°cin de l'etudiant :");
-scanf("%d",&e->cin);
+scanf("%s",&e->cin);
+}while((strlen(e->cin)!=8)||!(verification_cin(e->cin)));
+
 printf("Donnez le nom de l'etudiant :");
 scanf("%s",&e->nom);
 printf("Donnez le prenom de l'etudiant :");
 scanf("%s",&e->prenom);
-printf("Donnez age de l'etudiant :");
+do{
+printf("Donnez l'age de l'etudiant :");
 scanf("%d",&e->age);
+}while(e->age<=10||e->age>80);
+do{
 printf("Donnez le poids de l'étudiant :");
 scanf("%f",&e->poids);
+}while(e->poids<=10||e->poids>200);
+do{
 printf("Donnez la taille de l'etduaint:");
 scanf("%f",&e->taille);
+}while(e->taille<=1||e->taille>2.5);
 }
 
 void trier_liste_etudiant_nom(etudiant etudiants[],int n){
@@ -55,11 +89,11 @@ for (int i=0;i<n-1;i++){
 
 
 void afficher_etudiant(etudiant e){
-printf("%d \t\t",e.cin);
+printf("%s \t\t",e.cin);
 printf("%s \t\t",e.nom);
 printf("%s \t\t",e.prenom);
 printf("%d \t\t",e.age);
-printf("%.2f \t\t",e.poids);
+printf("%.2f \t\t\t",e.poids);
 printf("%.2f \n",e.taille);
 
 }
@@ -71,7 +105,12 @@ for(int i=supp_e;i<n;i++){
 
 
 }
+void copier_etudiant(etudiant e[],etudiant ce[],int n){
+for (int i=0;i<n;i++){
+    ce[i]=e[i];
+}
 
+}
 
 
 //matiéres
@@ -101,24 +140,49 @@ for(int i=0;i<n;i++){
    affichage_matiere(matiere_etudiant[i],nn);
 }
 }
-
-float calcule_moyenne_etudiant(matiere matiere_etudiant[],int n_e,int nm){
-    float moy=0;
-    for(int i=0;i<nm;i++){
-            moy+=(matiere_etudiant[i].note_partiel[n_e]*0.30)*matiere_etudiant[i].coeff;
-
+int indice_note_p(note note_p[],int nm,char cin[]){
+int i=0;
+int trouve=0;
+while(i<nm&&!trouve)
+{
+    if(strcmp(note_p[i].cin,cin)==0)
+        trouve=1;
+i++;
 }
+return i;
+}
+
+int indice_note_e(note note_e[],int n,char cin[]){
+int i=0;
+int trouve=0;
+while((i<n)&&!(trouve))
+{
+    if(strcmp(note_e[i].cin,cin)==0)
+        trouve=1;
+i++;
+}
+return i;
+}
+
+float calcule_moyenne_etudiant(matiere matiere_etudiant[],int nm,char cin[],int n){
+    float moy=0;
+    for(int i=0;i<nm;i++)
+        {
+
+        moy+=(matiere_etudiant[i].note_partiel[indice_note_p(matiere_etudiant[i].note_partiel,n,cin)].note*0.30)+(matiere_etudiant[i].note_examen[indice_note_e(matiere_etudiant[i].note_examen,n,cin)].note*0.70)*matiere_etudiant[i].coeff;
+
+        }
 return moy;
 
 
 }
 
-void calcule_moyenne_des_etudiants(matiere matiere_etudiant[],int n,float moyenne[],int nm){
+/*void calcule_moyenne_des_etudiants(matiere matiere_etudiant[],int n,float moyenne[],int nm){
 for(int i=0;i<n;i++){
     moyenne[i]=calcule_moyenne_etudiant(matiere_etudiant,n,nm);
 }
 
-}
+}*/
 
 
 
@@ -128,7 +192,7 @@ for(int i=0;i<n;i++){
 
 int main()
 {
-    etudiant etudiants[30]={12354,"dhambri\0","bilel\0",22,83,1.80,12354,"ahmed\0","bilel\0",22,83,1.80,12354,"aahmed\0","zfzf\0",22,83,1.80};
+    etudiant etudiants[40]={"12345678\0","ahambri\0","bilel\0",22,83,1.80,"87784897","dhambri\0","bilel\0",22,83,1.80,"87784803","bhambri\0","zfzf\0",22,83,1.80};
     matiere matiere_etudiant[30]={"algo\0",1.45,15.0,17.0,20};
     int n=3;
     int nm=1;
@@ -178,9 +242,9 @@ printf("       ||----------------------------------------------------------- Veu
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
 printf("       ||                                                            1. Afficher tous les etudiants                                                                || \n");
 printf("       ||                                                            2. Ajouter un etudiant                                                                        || \n");
-printf("       ||                                                            3. Supprimer un étudiant                                                                      || \n");
-printf("       ||                                                            4. Trier les étudiants selon leurs noms                                                       || \n");
-printf("       ||                                                            5. Calcule le moyenne d'une etudiant                                                       || \n");
+printf("       ||                                                            3. Supprimer un etudiant                                                                      || \n");
+printf("       ||                                                            4. Afficher Liste des étudiantes triées selon leurs noms                                      || \n");
+printf("       ||                                                            5. Calculer la moyenne d'un etudiant                                                          || \n");
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
 printf("       ||                                                            6. RETOUR AU MENU PRINCIPAL                                                                   || \n");
 printf("       ||                                                            7. QUITTER L'APPLICATION                                                                      || \n");
@@ -217,12 +281,26 @@ case 3:{
  getch();
 };break;
 case 4:{
-affichage_liste_etudiant(etudiants,n);
+etudiant copie_etudiants[40];
+copier_etudiant(etudiants,copie_etudiants,n);
+trier_liste_etudiant_nom(copie_etudiants,n);
+printf("La liste des étudiantes triées selon leurs noms :\n");
+affichage_liste_etudiant(copie_etudiants,n);
 getch();
-printf("\n");
-trier_liste_etudiant_nom(etudiants,n);
-affichage_liste_etudiant(etudiants,n);
- getch();
+};break;
+
+case 5:{
+
+    affichage_liste_etudiant(etudiants,n);
+    int num_e;
+    do{
+    printf("Donnez le numéro de l'étudiant :");
+    scanf("%d",&num_e);
+    }while(num_e<1||num_e>n);
+    num_e--;
+    printf("%s",etudiants[num_e]);
+
+    getch();
 };break;
 
 }
