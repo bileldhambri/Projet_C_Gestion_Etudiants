@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include<conio.h>
 typedef struct{
     char cin[9];
     char nom[20];
@@ -21,10 +21,144 @@ float note;
 typedef struct{
     char nom[20];
     float coeff;
-    int nombre_etudiant;
+    int nombre_etudiant;//le nombre des étudiants qui ont des notes dans chaque matière.
     note note_partiel[40];
     note note_examen[40];
 }matiere;
+
+//gestion fichier
+
+
+//Récupérer les étudiants dans le tableau à partir du fichier .txt
+void recupere_etudiants_fichier(etudiant e1[],int *n){
+FILE* fichier = fopen("etudiants.txt", "r");
+if (fichier == NULL)
+            {
+              printf("Error! Could not open file\n");
+              exit(-1);
+            }
+else{
+
+     etudiant e;
+     while(fscanf(fichier, "%s %d %s %f %s %f\n",e.cin,&e.age,e.prenom,&e.poids,e.nom,&e.taille)!= EOF){
+      //afficher_etudiant(e);
+      //printf("\n");
+      e1[*n]=e;
+      (*n)++;
+
+     }
+}
+fclose(fichier);
+}
+
+//enregistre les étudiants du tableau "Etudiant" dans le fichier "etudiants.txt"
+void enregistrer_etudiants_fichier(etudiant e[],int n){
+
+FILE* fichier = fopen("etudiants.txt", "w+");
+for(int i=0;i<n;i++){
+fprintf(fichier, "%s %d %s %f %s %f\n",e[i].cin,e[i].age,e[i].prenom,e[i].poids,e[i].nom,e[i].taille);
+}
+fclose(fichier);
+
+}
+
+//Récupérer les matières dans le tableau à partir du fichier matieres.txt
+void recupere_matieres_fichier(matiere m[],int *n){
+FILE* fichier = fopen("matiere.txt", "r");
+FILE* fn = fopen("notes.txt", "r");
+if (fichier == NULL)
+            {
+              printf("Error! Could not open file\n");
+              exit(-1);
+            }
+else{
+
+     matiere m1;
+     char cin[9];
+     float notee;
+     while(fscanf(fichier,"%s %f %d\n",m1.nom,&m1.coeff,&m1.nombre_etudiant)!= EOF){
+       m[*n]=m1;
+       for(int i=0;i<m1.nombre_etudiant;i++){
+        note n1;
+        fscanf(fn,"%s %f\n",n1.cin,&n1.note);
+        m[*n].note_partiel[i]=n1;
+        fscanf(fn,"%s %f\n",n1.cin,&n1.note);
+        m[*n].note_examen[i]=n1;
+      }
+      (*n)++;
+     }
+     //printf("%s ",m[1].note_partiel[0].cin);
+}
+fclose(fichier);
+fclose(fn);
+
+}
+
+//enregistre les matière du tableau "matiere_etudiants" dans le fichier "matiere.txt"
+void enregistrer_matiere_fichier(matiere m[],int n){
+
+FILE* fichier = fopen("matiere.txt", "w+");
+FILE* fn = fopen("notes.txt", "w+");
+
+for(int i=0;i<n;i++){
+
+fprintf(fichier,"%s %f %d\n",m[i].nom,m[i].coeff,m[i].nombre_etudiant);
+if(m[i].nombre_etudiant!=0){
+for(int j=0;j<m[i].nombre_etudiant;j++){
+
+    fprintf(fn,"%s %f\n",m[i].note_partiel[j].cin,m[i].note_partiel[j].note);
+    fprintf(fn,"%s %f\n",m[i].note_examen[j].cin,m[i].note_examen[j].note);
+
+}
+}
+}
+fclose(fichier);
+fclose(fn);
+
+}
+
+
+
+
+
+//enregistre les moyennes des étudiants dans le fichier "moyenne.txt"
+void enregistrer_moyennes_fichier(note m[],int n){
+
+FILE* fichier = fopen("moyenne.txt", "w+");
+
+for(int i=0;i<n;i++){
+fprintf(fichier,"%s %f\n",m[i].cin,m[i].note);
+}
+fclose(fichier);
+
+}
+
+
+//Récupérer les moyennes étudiants dans le tableau à partir du fichier .txt
+void recupere_moyennes_fichier(note m[],int *n){
+FILE* fichier = fopen("moyenne.txt", "r");
+if (fichier == NULL)
+            {
+              printf("Error! Could not open file\n");
+              exit(-1);
+            }
+else{
+     note n1;
+     while(fscanf(fichier,"%s %f\n",n1.cin,&n1.note)!= EOF){
+       m[*n]=n1;
+      (*n)++;
+     }
+}
+fclose(fichier);
+
+
+}
+
+
+
+
+
+
 
 
 // vérification CIN De L'étudiant
@@ -61,12 +195,62 @@ return existe;
 //Gestion étudiants
 
 void affichage_liste_etudiant(etudiant etudiants[],int n){
+    printf("Ú\n");
 printf("\nN°      \t N°Cin       \t \t Nom                    Prenom          Age             Taille          \tPoids      \n\n\n");
 for(int i=0;i<n;i++){
 
 printf("%d \t\t",i+1);
 afficher_etudiant(etudiants[i]);
 printf("\n");
+}
+}
+
+/*void rechercher_un_etudiant_par_nom(){
+
+                                                        printf("\nRechercher un etudiant par son nom :\n");
+                                                        printf("--------------------------\n");
+                                                        char nom[15];
+                                                        printf("Entrer le nom d'etudiant : ");
+                                                        scanf("%s",&nom);
+
+                                 for(i=1;i<=n;i++){
+
+                                                      if(strcmp(les_etudiants[i].nom,nom)==0){
+
+                                                       printf("\nRechercher par le nom : \n");
+                                                       printf("--------------------");
+                                                       printf("Informations sur l'etudiant (%s) :\n",nom);
+                                                       printf("----------------------------------\n");
+                                                       printf("CIN : %d\n",les_etudiants[i].num);
+                                                       printf("Nom : %s\n",les_etudiants[i].nom);
+                                                       printf("Prenom : %s\n",les_etudiants[i].prenom);
+                                                       printf("Moyenne : %0.2f\n",les_etudiants[i].moy);
+
+                                                           }
+                                                           }
+
+                                                           }*/
+
+
+
+void rechercher_un_etudiant_par_cin(etudiant les_etudiants[],int n,char cin[]){
+
+
+for(int i=0;i<=n;i++){
+
+if(strcmp(les_etudiants[i].cin,cin)==0)
+ {
+printf("\nInformations sur l'etudiant (%s) :\n",les_etudiants[i].nom);
+printf("----------------------------------\n");
+printf("CIN  : %d\n",les_etudiants[i].cin);
+printf("Nom : %s\n",les_etudiants[i].nom);
+printf("Prenom : %s\n",les_etudiants[i].prenom);
+printf("Age : %d\n",les_etudiants[i].age);
+printf("Poids : %2.f\n",les_etudiants[i].poids);
+printf("Taille : %2.f\n",les_etudiants[i].taille);
+//printf("Moyenne : %0.2f\n",les_etudiants[i].moy);
+
+}
 }
 }
 
@@ -77,13 +261,14 @@ void saisie_etudiant(etudiant *e,etudiant et[],int n){
 
 do{
 printf("Donnez N°cin de l'etudiant :");
-scanf("%s",&e->cin);
+scanf("%s",&(*e).cin);
 }while((strlen(e->cin)!=8)||!(verification_cin(e->cin))||(existe_cin(et,e->cin,n)));
-
 printf("Donnez le nom de l'etudiant :");
-scanf("%s",&e->nom);
+fflush(stdin);
+scanf("%[^\n]s",&e->nom);
 printf("Donnez le prenom de l'etudiant :");
-scanf("%s",&e->prenom);
+fflush(stdin);
+scanf("%[^\n]s",&e->prenom);
 do{
 printf("Donnez l'age de l'etudiant :");
 scanf("%d",&e->age);
@@ -93,10 +278,44 @@ printf("Donnez le poids de l'étudiant :");
 scanf("%f",&e->poids);
 }while(e->poids<=10||e->poids>200);
 do{
-printf("Donnez la taille de l'etduaint:");
+printf("Donnez la taille de l'etudiant:");
 scanf("%f",&e->taille);
 }while(e->taille<=1||e->taille>2.5);
+printf("Etudiant a ete ajoute avec succes");
 }
+
+//modification les données d'un étudiant
+void modifier_etudiant(etudiant *e){
+
+do{
+printf("Donnez le nouveau N° du CIN de l'etudiant:");
+scanf("%s",&(*e).cin);
+}while((strlen(e->cin)!=8)||!(verification_cin(e->cin)));
+printf("Donnez le nouveau nom de l'etudiant:");
+fflush(stdin);
+scanf("%[^\n]s",&e->nom);
+printf("Donnez le nouveau prenom de l'etudiant:");
+fflush(stdin);
+scanf("%[^\n]s",&e->prenom);
+do{
+printf("Donnez le nouvel age de l'etudiant:");
+scanf("%d",&e->age);
+}while(e->age<=10||e->age>80);
+do{
+printf("Donnez le nouveau poids de l'etudiant :");
+scanf("%f",&e->poids);
+}while(e->poids<=10||e->poids>200);
+do{
+printf("Donnez la nouvelle taille de l'etudiant:");
+scanf("%f",&e->taille);
+}while(e->taille<=1||e->taille>2.5);
+printf("Etudiant a ete modifie avec succes!");
+}
+
+
+
+
+
 
 void trier_liste_etudiant_nom(etudiant etudiants[],int n){
 etudiant aux_e;
@@ -149,10 +368,16 @@ printf("%.2f \n",e.poids);
 
 
 
-void supprimer_etudiant(etudiant etudiants[],int supp_e,int n){
+void supprimer_etudiant(etudiant etudiants[],int supp_e,int n,matiere m[],int nm){
+for(int i=0;i<nm;i++){
+    if(existe_notes_etudiant(m[i].note_partiel,m[i].nombre_etudiant,etudiants[supp_e].cin)){
+        supprimer_note_etudiants(m,i,indice_note_e(m[i].note_partiel,m[i].nombre_etudiant,etudiants[supp_e].cin));
+    }
+}
 for(int i=supp_e;i<n-1;i++){
     etudiants[i]=etudiants[i+1];
 }
+printf("Etudiant a ete supprime avec succes");
 }
 
 
@@ -191,13 +416,14 @@ for(int i=0;i<n-1;i++){
 }
 //Gestion matiéres
 void saisir_matiere(matiere *m){
+fflush(stdin);
 printf("Donnez le nom de la matiere:");
-scanf("%s",&m->nom);
+scanf("%[^\n]s",&m->nom);
 do{
 printf("Donnez le coefficient de la matiere :");
 scanf("%f",&m->coeff);
 }while((m->coeff<0)||(m->coeff>15));
-printf("La matière a été ajouté avec sucées !");
+
 }
 
 
@@ -232,7 +458,7 @@ int existe_matiere(matiere Matiere[],char M[],int n)
      int i=0; int existe=0;
       while(i<n&&!existe)
     {
-               if(strcmp(Matiere[i].nom,M)==0)
+               if(strcmp(tolower(Matiere[i].nom),tolower(M))==0)
                     {
                             existe=1;
                }
@@ -245,6 +471,21 @@ return existe;
 
 
 //Gestion notes
+
+//permet de vérifier q'un étduiant a des notes
+int existe_notes_etudiant(note note_p[],int nm,char cin[]){
+int i=0;
+int trouve=0;
+while(i<nm&&!trouve)
+{
+    if(strcmp(note_p[i].cin,cin)==0)
+        trouve=1;
+    else
+        i++;
+}
+return trouve;
+}
+
 int indice_note_p(note note_p[],int nm,char cin[]){
 int i=0;
 int trouve=0;
@@ -425,16 +666,17 @@ for(int i=0;i<n-1;i++){
            }
         }
 }
-
-
 }
+
 void supprimer_note_etudiants(matiere e[],int i_m,int i_e){
+
 for(int i=i_e;i<e[i_m].nombre_etudiant-1;i++){
     e[i_m].note_examen[i]=e[i_m].note_examen[i+1];
     e[i_m].note_partiel[i]=e[i_m].note_partiel[i+1];
 
 }
 e[i_m].nombre_etudiant--;
+
 }
 
 
@@ -534,18 +776,19 @@ while(i<nm&&verif){
 
 int main()
 {
-    etudiant etudiants[40]={"12345678\0","ahambri\0","bilel\0",25,83,1.80,"87784897","dhambri\0","bilel\0",22,83,1.80,"87784803","bhambri\0","zfzf\0",22,83,1.80};
-    matiere matiere_etudiant[30]={"algorithme\0",1.45,0,17.0,20};
+
+    //etudiant etudiants[40]={"12345678\0","ahambri\0","bilel\0",25,83,1.80,"87784897","dhambri\0","bilel\0",22,83,1.80,"87784803","bhambri\0","zfzf\0",22,83,1.80};
+    etudiant etudiants[40];
+    //matiere matiere_etudiant[30]={"algorithme\0",1.45,0,17.0,20};
+    matiere matiere_etudiant[30];
     note moyennes[40];
-    int n=3,m=0;
-    int nm=1;
+    int n=0,m=0;
+    int nm=0;
     int choix,choix1,choix3;
-    /*saisie_etudiant(&etudiants[n]);
-    n++;
-    affichage_liste_etudiant(etudiants,n);
-    saisir_matiere(&matiere_etudiant[nm],n);
-    nm++;
-    affichage_liste_matiere(matiere_etudiant,nm,n);*/
+    recupere_etudiants_fichier(etudiants,&n);
+    recupere_matieres_fichier(matiere_etudiant,&nm);
+    recupere_moyennes_fichier(moyennes,&m);
+
 
 
     getch();
@@ -586,50 +829,81 @@ printf("       ||----------------------------------------------------------- Veu
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
 printf("       ||                                                            1. Afficher tous les etudiants                                                                || \n");
 printf("       ||                                                            2. Ajouter un etudiant                                                                        || \n");
-printf("       ||                                                            3. Supprimer un etudiant                                                                      || \n");
-printf("       ||                                                            4. Afficher Liste des étudiantes triée selon leurs noms                                       || \n");
-printf("       ||                                                            5. Afficher Liste une étudiante triée selon leurs âges                                        || \n");
-printf("       ||                                                            6. Calculer la moyenne d'un etudiant                                                          || \n");
-printf("       ||                                                            7. Calculer les moyennes des étudiants                                                        || \n");
-printf("       ||                                                            8. Afficher les moyennes des étudiants                                                        || \n");
-printf("       ||                                                            9. Trier les rangs des étudiants                                                              || \n");
-printf("       ||                                                            10. Affichage des notes/ PV                                                                   || \n");
+printf("       ||                                                            3. Modifier un etudiant                                                                        || \n");
+printf("       ||                                                            4. Supprimer un etudiant                                                                      || \n");
+printf("       ||                                                            5. Rechercher un etudiant par CIN                                                             || \n");
+printf("       ||                                                            6. Afficher Liste des étudiantes triée selon leurs noms                                       || \n");
+printf("       ||                                                            7. Afficher Liste une étudiante triée selon leurs âges                                        || \n");
+printf("       ||                                                            8. Calculer la moyenne d'un etudiant                                                          || \n");
+printf("       ||                                                            9. Calculer les moyennes des étudiants                                                        || \n");
+printf("       ||                                                            10. Afficher les moyennes des étudiants                                                        || \n");
+printf("       ||                                                            11. Trier les rangs des étudiants                                                             || \n");
+printf("       ||                                                            12. Affichage des notes/ PV                                                                   || \n");
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
-printf("       ||                                                            11. RETOUR AU MENU PRINCIPAL                                                                  || \n");
-printf("       ||                                                            12. QUITTER L'APPLICATION                                                                     || \n");
+printf("       ||                                                            13. RETOUR AU MENU PRINCIPAL                                                                  || \n");
+printf("       ||                                                            14. QUITTER L'APPLICATION                                                                     || \n");
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
 printf("       ||----------------------------------------------------------------------------------------------------------------------------------------------------------|| \n");
 printf("                                                                    Donnez votre choix:");
 scanf("%d",&choix1);
 switch(choix1){
 case 1:{
-      if(n>=0)
 
-     affichage_liste_etudiant(etudiants,n);
+
+      if(n>=0)
+        affichage_liste_etudiant(etudiants,n);
+
 
  getch();
 };break;
 case 2:{
 saisie_etudiant(&etudiants[n],etudiants,n);
 n++;
+enregistrer_etudiants_fichier(etudiants,n);
 getch();
 };break;
 case 3:{
+    affichage_liste_etudiant(etudiants,n);
+    int mod_e;
+    do{
+       printf("Donnez le numero de l'etudiant à modifier :");
+    scanf("%d",&mod_e);
+    }while(mod_e<1||mod_e>n);
+    mod_e--;
+    modifier_etudiant(&etudiants[mod_e]);
+
+
+};break;
+case 4:{
+
     affichage_liste_etudiant(etudiants,n);
     int sup_e;
     do{
        printf("Donnez le numéro de l'etudiant à supprimer :");
     scanf("%d",&sup_e);
-
-
     }while(sup_e<1||sup_e>n);
     sup_e--;
-    supprimer_etudiant(etudiants,sup_e,n);
+    supprimer_etudiant(etudiants,sup_e,n,matiere_etudiant,nm);
     n--;
+    enregistrer_etudiants_fichier(etudiants,n);
     affichage_liste_etudiant(etudiants,n);
- getch();
+    //enregistrer_matiere_fichier(matiere_etudiant,nm);
+    getch();
+
 };break;
-case 4:{
+case 5:{
+char cin[9];
+printf("Saisir un CIN : ");
+scanf("%s",&cin);
+if(!existe_cin(etudiants,cin,n)){
+    printf("cet étudiant n'existe pas\n");
+}
+else{
+rechercher_un_etudiant_par_cin(etudiants,n,cin);
+}
+getch();
+};break;
+case 6:{
 etudiant copie_etudiants[40];
 copier_etudiant(etudiants,copie_etudiants,n);
 trier_liste_etudiant_nom(copie_etudiants,n);
@@ -637,11 +911,11 @@ printf("La liste des étudiants triées selon leurs noms :\n");
 affichage_liste_etudiant(copie_etudiants,n);
 getch();
 };break;
-case 5:{
+case 7:{
 trier_liste_etudiant_age(etudiants,n);
  getch();
 };break;
-case 6:{
+case 8:{
 
     affichage_liste_etudiant(etudiants,n);
     int num_e;
@@ -654,25 +928,27 @@ case 6:{
     printf("La moyenne de l'étudiant %s est %.2f",etudiants[num_e].cin,calcule_moyenne_etudiant(matiere_etudiant,nm,etudiants[num_e].cin,n));
     }
     else{
+
         printf("Vous devez vérifier les notes de cet étudiant!");
     }
     getch();
 };break;
-case 7:{
+case 9:{
     if(m==n){
-        printf("Vous avez déja calculer les moyennes des étudiants !\n");
+        printf("Vous devez calculer les moyennes de tous les etudiants!\n");
     }
     else{
-  if(verif_tous_etudiants_note(matiere_etudiant,n,nm))
+  if(verif_tous_etudiants_note(matiere_etudiant,n,nm)){
     calculer_moy_etudiants(moyennes,n,matiere_etudiant,nm,etudiants,&m);
-
+    enregistrer_moyennes_fichier(moyennes,m);
+  }
   else
     printf("Vous devez d'abord ajouter les notes des étudiants dans chaque matière.");
     }
 
 getch();
 };break;
-case 8:{
+case 10:{
 
 if(m==n){
 affichge_moyennes_etudiants(moyennes,n,etudiants);
@@ -682,7 +958,7 @@ else{
 }
 getch();
 };break;
-case 9:{
+case 11:{
 if(m!=n){
         printf("Vous devez calculer les moyennes des étudiants!");
 }
@@ -690,7 +966,7 @@ else
 trier_rang_etudiant(moyennes,m,etudiants);
 getch();
 };break;
-case 10:{
+case 12:{
 if(m!=n){
         printf("Vous devez calculer les moyennes des étudiants!");
 }
@@ -699,9 +975,9 @@ affichage_pv_notes(matiere_etudiant,nm,etudiants,n);
 getch();
 };break;
 }
-if(choix1==12)
+if(choix1==14)
     choix=3;
-}while((choix1!=11)&&(choix1!=12));
+}while((choix1!=13)&&(choix1!=14));
 };break;
 
 
@@ -737,14 +1013,18 @@ case 1:{
 case 2:{
 int verif;
 do{
+
 saisir_matiere(&matiere_etudiant[nm]);
 verif=existe_matiere(matiere_etudiant,matiere_etudiant[nm].nom,nm);
 if(verif){
 printf("\nCette matiére existe déja !");
 getch();
 }
+
 }while(verif);
 nm++;
+printf("La matière a été ajouté avec sucées !");
+enregistrer_matiere_fichier(matiere_etudiant,nm);
 getch();
 
 
@@ -761,6 +1041,7 @@ sup_m--;
 supprimer_matiere(matiere_etudiant,sup_m,nm);
 printf("Suppression effectuée avec succeés!");
 nm--;
+enregistrer_matiere_fichier(matiere_etudiant,nm);
  getch();
 };break;
 case 4:{
@@ -776,13 +1057,15 @@ printf("Donnez le numéro de matiére à modifier :");
 scanf("%d",&m_m);
 }while(m_m<1||m_m>nm);
 printf("Donnez le nom de la matiere:");
-scanf("%s",&nom);
+fflush(stdin);
+scanf("%[^\n]s",&nom);
 do{
 printf("Donnez le coefficient de la matiere :");
 scanf("%f",&cf);
 }while((cf<0)||(cf>15));
 modifier_matiere(matiere_etudiant,m_m-1,nom,cf);
-
+enregistrer_matiere_fichier(matiere_etudiant,nm);
+getch();
 };break;
 
 case 5:{
@@ -833,6 +1116,8 @@ do{
 printf("\n\nDonnez le numero de l'etudiant :");
 scanf("%d",&i_e);
 }while(i_e<=0||i_e>n);
+
+if(!existe_notes_etudiant(matiere_etudiant[i_m-1].note_partiel,nm,etudiants[i_e-1].cin)){
 float note_p,note_e;
 do{
 printf("\n\nDonnez la note du partiel :");
@@ -845,10 +1130,17 @@ scanf("%f",&note_e);
 ajouter_notes_etudiant(matiere_etudiant,note_p,note_e,i_m-1,etudiants[i_e-1].cin);
 //printf("%.2f\n",matiere_etudiant[i_m-1].note_partiel[nn].note);
 //printf("%.2f\n",matiere_etudiant[i_m-1].note_examen[nn].note);
+enregistrer_matiere_fichier(matiere_etudiant,nm);
+}
+else{
+   printf("Vous avez déja ajoute les notes de cet etudiant !");
+}
+
 }
 else{
     printf("Vous devez ajouter des matières!");
 }
+
 getch();
 
 
@@ -888,7 +1180,8 @@ printf("\n\nDonnez le numero de l'etudiant :");
 scanf("%d",&i_e);
 }while(i_e<=0||i_e>matiere_etudiant[i_m-1].nombre_etudiant);
 supprimer_note_etudiants(matiere_etudiant,i_m-1,i_e-1);
-printf("Les notes de l'étudiant ont été supprimer avec succès!");
+printf("Les notes de l'étudiant ont été supprimé avec succès!");
+enregistrer_matiere_fichier(matiere_etudiant,nm);
 getch();
 
 };break;
@@ -916,6 +1209,7 @@ printf("\n\nDonnez la note de l'examen :");
 scanf("%f",&note_e);
 }while(note_e<0||note_e>20);
 modifier_notes_etudiants(matiere_etudiant,i_m-1,i_e-1,note_p,note_e);
+enregistrer_matiere_fichier(matiere_etudiant,nm);
 };break;
 
 case 5:{
