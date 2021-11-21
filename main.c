@@ -928,7 +928,7 @@ char cin[9];
 printf("Saisir un CIN : ");
 scanf("%s",&cin);
 if(!existe_cin(etudiants,cin,n)){
-    printf("cet étudiant n'existe pas\n");
+    printf("cet etudiant n'existe pas\n");
 }
 else{
 rechercher_un_etudiant_par_cin(etudiants,n,cin);
@@ -939,7 +939,7 @@ case 6:{
 etudiant copie_etudiants[40];
 copier_etudiant(etudiants,copie_etudiants,n);
 trier_liste_etudiant_nom(copie_etudiants,n);
-printf("La liste des étudiants triées selon leurs noms :\n");
+printf("La liste des etudiants triees selon leurs noms :\n");
 affichage_liste_etudiant(copie_etudiants,n);
 getch();
 };break;
@@ -952,12 +952,12 @@ case 8:{
     affichage_liste_etudiant(etudiants,n);
     int num_e;
     do{
-    printf("Donnez le numéro de l'étudiant :");
+    printf("Donnez le numéro de l'etudiant :");
     scanf("%d",&num_e);
     }while(num_e<1||num_e>n);
     num_e--;
     if(verif_etudiant_note(matiere_etudiant,nm,etudiants[num_e].cin)){
-    printf("La moyenne de l'étudiant %s %s est %.2f",etudiants[num_e].prenom,etudiants[num_e].nom,calcule_moyenne_etudiant(matiere_etudiant,nm,etudiants[num_e].cin,n));
+    printf("La moyenne de l'etudiant %s %s est %.2f",etudiants[num_e].prenom,etudiants[num_e].nom,calcule_moyenne_etudiant(matiere_etudiant,nm,etudiants[num_e].cin,n));
     }
     else{
 
@@ -973,7 +973,7 @@ case 9:{
     enregistrer_moyennes_fichier(moyennes,m);
   }
   else
-    printf("Vous devez d'abord ajouter les notes des étudiants dans chaque matière.");
+    printf("Vous devez d'abord ajouter les notes des etudiants dans chaque matiere.");
 
 
 getch();
@@ -984,13 +984,13 @@ if(m==n){
 affichge_moyennes_etudiants(moyennes,n,etudiants);
 }
 else{
-    printf("Vous devez calculer les moyennes des étudiants!");
+    printf("Vous devez calculer les moyennes des etudiants!");
 }
 getch();
 };break;
 case 11:{
 if(m!=n){
-        printf("Vous devez calculer les moyennes des étudiants!");
+        printf("Vous devez calculer les moyennes des etudiants!");
 }
 else
 trier_rang_etudiant(moyennes,m,etudiants);
@@ -998,7 +998,7 @@ getch();
 };break;
 case 12:{
 if(m!=n){
-        printf("Vous devez calculer les moyennes des étudiants!");
+        printf("Vous devez calculer les moyennes des etudiants!");
 }
 else
 affichage_pv_notes(matiere_etudiant,nm,etudiants,n);
